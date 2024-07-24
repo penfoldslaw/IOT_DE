@@ -1,6 +1,9 @@
 import sys
 import paho.mqtt.client as mqtt
 
+
+
+
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 broker = 'test.mosquitto.org'
 port = 1883
