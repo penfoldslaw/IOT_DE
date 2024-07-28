@@ -16,10 +16,10 @@ if client.connect(broker, 1883, 60) != 0:
     print("Couldn't connect to the mqtt broker")
     sys.exit(1)
 
-client.subscribe(topic)
+client.subscribe((topic,2))
 
 try:
-    print("Press CTRL+C to exit...")
+    print("Press CTRL+Z to exit...")
     client.loop_forever()
 except Exception:
     print("Caught an Exception, something went wrong...")
