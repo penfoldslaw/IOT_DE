@@ -17,32 +17,34 @@ tire_temps = randint(0,99)
 
 
 
+def run():
+    while True:
+        telemetry_data = {
+            "id":1,
+            "timestamp":datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+            "rpm":randint(6000,15000),
+            "gear":randint(1,6),
+            "throttle_position":randint(0,100),
+            "tire_temps": {"front_left":randint(0,99), "front_right":randint(0,99), "rear_left":randint(0,99), "rear_right":randint(0,99)} 
+        }
 
-while True:
-    telemetry_data = {
-        'id':1,
-        'timestamp':  datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-        'rpm': randint(6000,15000),
-        'gear':randint(1,6),
-        'throttle_position': randint(0,100),
-        'tire_temps': {"front_left":randint(0,99), "front_right":randint(0,99), "rear_left":randint(0,99), "rear_right":randint(0,99)} 
-    }
+        load = json.dumps(telemetry_data)
 
-    load = json.dumps(telemetry_data)
+        client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+        broker = 'test.mosquitto.org'
+        port = 1883
+        topic = 'test_topic1'
 
-    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-    broker = 'test.mosquitto.org'
-    port = 1883
-    topic = 'test_topic1'
-
-    if client.connect(broker,port, 60) != 0:
-        print("Couldn't connect to the mqtt broker")
-        sys.exit(1)
+        if client.connect(broker,port, 60) != 0:
+            print("Couldn't connect to the mqtt broker")
+            sys.exit(1)
 
 
-    client.publish(topic,str(load), 0)
-    if datetime.now() > when_loop_stop:
-        break
-    time.sleep(5)# publish a new line every 5 seconds without it loop publish lots at a time
+        client.publish(topic,load, 0)
+        if datetime.now() > when_loop_stop:
+            break
+        time.sleep(5)# publish a new line every 5 seconds without it loop publish lots at a time
 
-print('job done')
+if __name__ == '__main__' :
+    run()
+    print(f'job done {when_loop_stop} is up')
