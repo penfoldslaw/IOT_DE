@@ -8,16 +8,18 @@ import json
 import paho.mqtt.client as mqtt
 
 dt = datetime.now() # can't use variables in the while loop they don't change they stay consisent
-formatted_dt = dt.strftime('%Y-%m-%dT%H:%M:%S.%fZ') # this produces the current data to the mirco-second
-when_loop_stop = dt + timedelta(seconds=20) # this is important is the time for when the loop should stop running
-rmp_data =  randint(6000,15000)
-gear_data = randint(1,6)
-throttle_position_data = randint(0,100)
-tire_temps = randint(0,99)
+formatted_dt = dt.strftime('%Y-%m-%dT%H:%M:%S.%fZ') # this produces the current data to the mirco-second not use in code
+when_loop_stop = dt + timedelta(seconds=20) ### *** this is important is the time for when the loop should stop running *** ####
+
+
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+broker = 'test.mosquitto.org'
+port = 1883
+topic = 'f1-telemetry' ### this topic has to be the same for all subscribes and kafka topics if you want the data being publish in this file
 
 
 
-def run():
+def publish():
     while True:
         telemetry_data = {
             "id":1,
@@ -28,23 +30,18 @@ def run():
             "tire_temps": {"front_left":randint(0,99), "front_right":randint(0,99), "rear_left":randint(0,99), "rear_right":randint(0,99)} 
         }
 
-        load = json.dumps(telemetry_data)
-
-        client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-        broker = 'test.mosquitto.org'
-        port = 1883
-        topic = 'test_topic1'
+        load = json.dumps(telemetry_data) ### json.dumps transform it into json format
 
         if client.connect(broker,port, 60) != 0:
             print("Couldn't connect to the mqtt broker")
             sys.exit(1)
 
-
-        client.publish(topic,load, 0)
+        client.publish(topic,load, 0) ### this publishes the code to the the the subscriber which will then be pushed to kafka if you run bridge
         if datetime.now() > when_loop_stop:
             break
-        time.sleep(5)# publish a new line every 5 seconds without it loop publish lots at a time
+        time.sleep(5) # publish a new line every 5 seconds without it loop publish lots at a time
+
 
 if __name__ == '__main__' :
-    run()
+    publish()
     print(f'job done {when_loop_stop} is up')

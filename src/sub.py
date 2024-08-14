@@ -1,28 +1,41 @@
 import sys
-
 import paho.mqtt.client as mqtt
 
 broker = 'test.mosquitto.org'
 port = 1883
-topic = 'test_topic1'
+topic = 'f1-telemetry'
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 def message_handling(client, userdata, msg):
     print(f"{msg.topic}: {msg.payload.decode('utf-8')}")
 
+def need_it():
+ """""""""
 
-client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-client.on_message = message_handling
+ this is only needed for the if __name__ this is because without it you would have to call the message_handling
+ function and that would require you to put in the parameters which I guess you could do if you know how to go around it,
+ but client.on_message is how I have seen people do it to produce the message and to run it, in the if __name__ this is 
+ the best way.
 
-if client.connect(broker, 1883, 60) != 0:
-    print("Couldn't connect to the mqtt broker")
-    sys.exit(1)
+ """""""""
+ client.on_message = message_handling
 
-client.subscribe((topic,2))
+def connect_and_subscribe():
+    
+    if client.connect(broker, 1883, 60) != 0:
+        print("Couldn't connect to the mqtt broker")
+        sys.exit(1)
 
-try:
-    print("Press CTRL+Z to exit...")
-    client.loop_forever()
-except Exception:
-    print("Caught an Exception, something went wrong...")
-finally:
-    print("Disconnecting from the MQTT broker")
-    client.disconnect()
+    client.subscribe((topic,2)) ## this subscribe to the topic
+
+    try:
+        print("Press CTRL+Z to exit...")
+        client.loop_forever()
+    except Exception:
+        print("Caught an Exception, something went wrong...")
+    finally:
+        print("Disconnecting from the MQTT broker")
+        client.disconnect()
+
+if __name__ == '__main__':
+    need_it()
+    connect_and_subscribe()
