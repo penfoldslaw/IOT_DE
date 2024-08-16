@@ -44,4 +44,5 @@ def publish():
 
 if __name__ == '__main__' :
     publish()
-    print(f'job done {when_loop_stop} is up')
+    time.sleep(10)
+    print(f'job done, no more messages being published')
