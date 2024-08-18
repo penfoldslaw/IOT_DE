@@ -59,5 +59,3 @@ services:
     volumes:
     #- /home/worriedemployee/repo/IOT_DE/app:/andy
       - ./stream:/stream  # Mount your local app directory to the container
-    
-
