@@ -17,8 +17,6 @@ services:
 
 ############################################### spark
 
-
-
   spark-master:
     image: bitnami/spark:latest
     container_name: spark-master
