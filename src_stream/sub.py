@@ -1,10 +1,18 @@
 import sys
+import configparser
+from config_manager import client_version    
 import paho.mqtt.client as mqtt
 
-broker = 'test.mosquitto.org'
-port = 1883
-topic = 'f1-telemetry'
-client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+config = configparser.ConfigParser()
+config.read('config.cfg')
+
+client = client_version()
+broker = config.get('mqtt','broker')
+port = config.getint('mqtt','port')
+topic_1 = config.get('mqtt', 'topic_1')
+topic_2 = config.get('mqtt','topic_2')
+
+
 def message_handling(client, userdata, msg):
     print(f"{msg.topic}: {msg.payload.decode('utf-8')}")
 
@@ -25,7 +33,8 @@ def connect_and_subscribe():
         print("Couldn't connect to the mqtt broker")
         sys.exit(1)
 
-    client.subscribe((topic,2)) ## this subscribe to the topic
+    client.subscribe((topic_1,2)) ## this subscribe to the topic
+    client.subscribe((topic_2,2))
 
     try:
         print("Press CTRL+Z to exit...")
