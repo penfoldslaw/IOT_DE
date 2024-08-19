@@ -1,6 +1,6 @@
 
 .PHONY: run
-run:
+spark:
 	docker compose run spark-submit spark-submit --master spark://spark-master:7077 /stream/spark.py
 # To change the file change spark.py to what you want or create a run with a different name
 
