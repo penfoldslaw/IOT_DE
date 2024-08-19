@@ -57,5 +57,4 @@ services:
     depends_on:
       - spark-master
     volumes:
-    #- /home/worriedemployee/repo/IOT_DE/app:/andy
       - ./stream:/stream  # Mount your local app directory to the container
