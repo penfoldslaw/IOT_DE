@@ -11,9 +11,15 @@ services:
     container_name: kafka
     ports:
       - "9092:9092"
+      - "29092:29092"
+      - "9094:9094"
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://localhost:9092,OUTSIDE://kafka:9094,DOCKER://host.docker.internal:29092
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094,DOCKER://0.0.0.0:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+
 
 ############################################### spark
 

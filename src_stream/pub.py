@@ -21,7 +21,7 @@ topic_2 = config.get('mqtt','topic_2')
 
 dt = datetime.now() # can't use variables in the while loop they don't change they stay consisent
 formatted_dt = dt.strftime('%Y-%m-%dT%H:%M:%S.%fZ') # this produces the current data to the mirco-second not use in code
-when_loop_stop = dt + timedelta(seconds=20) ### *** this is important is the time for when the loop should stop running *** ####
+when_loop_stop = dt + timedelta(minutes=3) ### *** this is important is the time for when the loop should stop running *** ####
 
 
 
