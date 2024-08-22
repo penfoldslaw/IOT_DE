@@ -5,7 +5,7 @@ topic_2=$(awk -F ' = ' '/topic_2/ {print $2}' "$config_file")
 
 
 echo "starting Docker Compose....."
-docker compose up -d
+docker compose up --build -d
 
 
 echo "Creating Kafka topic_1...."

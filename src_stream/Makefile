@@ -31,6 +31,7 @@ create:
 	docker exec -it kafka kafka-topics.sh --create --topic f1-telemetry-1 --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
 
 consume:
+	docker exec -it kafka kafka-console-consumer.sh --topic f1-telemetry-1 --bootstrap-server localhost:9092 --from-beginning
 	
 
 	
