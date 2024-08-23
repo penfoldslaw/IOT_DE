@@ -8,9 +8,11 @@ import time
 import configparser
 
 config = configparser.ConfigParser()
-config.read('/jackpot/config.cfg')
+config.read('/jackpot/stream/config.cfg') # this file path is from docker
 topic_1 = config.get('mqtt', 'topic_1')
 topic_2 = config.get('mqtt','topic_2')
+
+topics = f"{topic_1},{topic_2}"
 
 # Initialize SparkSession
 spark = SparkSession.builder \
@@ -38,7 +40,7 @@ df = spark \
     .readStream \
     .format("kafka") \
     .option("kafka.bootstrap.servers", "kafka:9094") \
-    .option("subscribe",topic_1) \
+    .option("subscribe",topics) \
     .option("startingOffsets", "earliest") \
     .load()
 

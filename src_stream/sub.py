@@ -1,10 +1,10 @@
 import sys
 import configparser
-from config_manager import client_version    
+from config.version import client_version    
 import paho.mqtt.client as mqtt
 
 config = configparser.ConfigParser()
-config.read('config.cfg')
+config.read('../src_stream/config/config.cfg')
 
 client = client_version()
 broker = config.get('mqtt','broker')
