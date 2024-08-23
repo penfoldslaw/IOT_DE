@@ -31,6 +31,9 @@ services:
     ports:
       - "7077:7077"
       - "8080:8080"
+    volumes:
+      - .:/jackpot
+    
 
   spark-worker-1:
     image: bitnami/spark:latest
@@ -64,3 +67,4 @@ services:
       - spark-master
     volumes:
       - ./stream:/stream  # Mount your local app directory to the container
+      - .:/jackpot # this copys everything in out local to the docker container you can understand this be going to master container cd backwards to get jackpot and do ls -lart to see the local

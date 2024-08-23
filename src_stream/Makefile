@@ -4,6 +4,10 @@ spark:
 	docker compose run spark-submit spark-submit --master spark://spark-master:7077 --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2 /stream/spark.py
 # To change the file change spark.py to what you want or create a run with a different name
 
+spark2:
+	docker compose run spark-submit spark-submit --master spark://spark-master:7077 --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2 src_stream/stream2/spark.py
+# To change the file change spark.py to what you want or create a run with a different name
+
 
 .PHONY: remove
 remove:
@@ -33,5 +37,10 @@ create:
 consume:
 	docker exec -it kafka kafka-console-consumer.sh --topic f1-telemetry-1 --bootstrap-server localhost:9092 --from-beginning
 	
+doc_master:
+	docker exec -it spark-master /bin/bash
+
+doc_submit:
+	docker exec -it spark-submit /bin/bash
 
 	
