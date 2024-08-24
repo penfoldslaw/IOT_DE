@@ -32,7 +32,15 @@ schema = StructType([
     StructField("gear", IntegerType()),
     StructField("steer", IntegerType()),
     StructField("throttle_position", IntegerType()),
+    StructField("Brake", IntegerType()),
     StructField("tire_temps", StringType())
+])
+
+tire_temps_schema = StructType([
+    StructField("front_left", IntegerType()),
+    StructField("front_right", IntegerType()),
+    StructField("rear_left", IntegerType()),
+    StructField("rear_right", IntegerType())
 ])
 
 # Read from Kafka
@@ -52,6 +60,25 @@ rdd_sum = rdd.sum() # Without this operation, Spark might be incorrectly initial
 df_parsed = df.selectExpr("CAST(value AS STRING)") \
               .select(from_json(col("value"), schema).alias("data")) \
               .select("data.*")
+
+df_parsed = df_parsed.withColumn("tire_temps", from_json(col("tire_temps"), tire_temps_schema)) # only being used because of nested json
+
+
+df_parsed = df_parsed.select(
+    col("id"),
+    col("timestamp"),
+    col("rpm"),
+    col("gear"),
+    col("steer"),
+    col("throttle_position"),
+    col("Brake"),
+    col("tire_temps.front_left").alias("front_left_temp"),
+    col("tire_temps.front_right").alias("front_right_temp"),
+    col("tire_temps.rear_left").alias("rear_left_temp"),
+    col("tire_temps.rear_right").alias("rear_right_temp")
+) # only being used because of nested json
+
+
 
 # Start streaming query
 query = df_parsed.writeStream \

@@ -66,5 +66,5 @@ services:
     depends_on:
       - spark-master
     volumes:
-      - ./stream:/stream  # Mount your local app directory to the container
-      - .:/jackpot # this copys everything in out local to the docker container you can understand this be going to master container cd backwards to get jackpot and do ls -lart to see the local
+      - ./stream:/stream  # creates an empty folder in local and in docker
+      - .:/jackpot # this copys everything in the local to the docker container you can understand this by going to master container cd backwards to get jackpot and do ls -lart to see the local

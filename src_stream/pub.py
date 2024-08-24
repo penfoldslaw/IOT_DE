@@ -35,6 +35,7 @@ def publish():
             "gear":randint(1,6),
             "steer":randint(-450,450),
             "throttle_position":randint(0,100),
+            "Brake":randint(0,100),
             "tire_temps": {"front_left":randint(0,99), "front_right":randint(0,99), "rear_left":randint(0,99), "rear_right":randint(0,99)} 
         }
 
@@ -46,6 +47,7 @@ def publish():
             "gear":randint(1,6),
             "steer":randint(-450,450),
             "throttle_position":randint(0,100),
+            "Brake":randint(0,100),
             "tire_temps": {"front_left":randint(0,99), "front_right":randint(0,99), "rear_left":randint(0,99), "rear_right":randint(0,99)} 
         }
 
