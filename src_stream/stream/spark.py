@@ -4,6 +4,8 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import from_json, col
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
+from pyspark.sql.functions import expr
+from pyspark.sql.functions import *
 import time
 import configparser
 
@@ -18,7 +20,9 @@ topics = f"{topic_1},{topic_2}"
 spark = SparkSession.builder \
     .appName("officialnow") \
     .master("spark://spark-master:7077") \
-    .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.0") \
+    .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2,com.datastax.spark:spark-cassandra-connector_2.12:3.5.1") \
+    .config("spark.cassandra.connection.host", "localhost")\
+    .config("spark.cassandra.connection.port", "9042") \
     .getOrCreate()
 
 spark.sparkContext.setLogLevel("ERROR") # hides alot of logs 
@@ -26,7 +30,7 @@ spark.sparkContext.setLogLevel("ERROR") # hides alot of logs
 
 # Define schema for Kafka data
 schema = StructType([
-    StructField("id", StringType()),
+    StructField("id", IntegerType()),
     StructField("timestamp", StringType()),
     StructField("rpm", IntegerType()),
     StructField("gear", IntegerType()),
@@ -80,7 +84,7 @@ df_parsed = df_parsed.select(
 
 
 
-# Start streaming query
+# Start streaming query and writing it to the console
 query = df_parsed.writeStream \
     .outputMode("append") \
     .format("console") \
@@ -88,13 +92,20 @@ query = df_parsed.writeStream \
     .start() \
     .awaitTermination()
 
+def process_batch(df, batch_id):
+    df.write \
+      .format("org.apache.spark.sql.cassandra") \
+      .options(keyspace="telemetry_keyspace", table="f1_data") \
+      .mode("append") \
+      .save()
+    df.show()
 
+# Writing the DataFrame to Cassandra
+cassandra_query = df_parsed.writeStream \
+    .foreachBatch(process_batch) \
+    .outputMode("update") \
+    .trigger(processingTime="40 seconds") \
+    .start() \
+    .awaitTermination()
 
-# Print the sum of the RDD and Spark information
-# print(f"The sum of the RDD is: {rdd_sum}")
-# print("Spark Local IP:", spark.conf.get("spark.driver.host"))
-# print("Spark Master IP:", spark.conf.get("spark.master"))
-# df_parsed.printSchema()
-
-# Stop the SparkSession
 spark.stop()

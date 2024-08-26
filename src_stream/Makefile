@@ -1,7 +1,12 @@
 
 .PHONY: run
 spark:
-	docker compose run spark-submit spark-submit --master spark://spark-master:7077 --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2 /stream/spark.py
+	docker compose run spark-submit spark-submit \
+  --master spark://spark-master:7077 \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2,com.datastax.spark:spark-cassandra-connector_2.12:3.5.1 \
+  --conf spark.sql.extensions=com.datastax.spark.connector.CassandraSparkExtensions \
+  /stream/spark.py
+
 # To change the file change spark.py to what you want or create a run with a different name
 
 spark2:
@@ -42,5 +47,11 @@ doc_master:
 
 doc_submit:
 	docker exec -it spark-submit /bin/bash
+
+cqlsh:
+	docker exec -it cassandra cqlsh
+
+cassandra:
+	docker exec -it cassandra bin/bash
 
 	

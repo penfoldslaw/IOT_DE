@@ -27,6 +27,7 @@ services:
     image: bitnami/spark:latest
     container_name: spark-master
     environment:
+      - SPARK_RPC_MESSAGE_MAXSIZE=2047
       - SPARK_MODE=master
     ports:
       - "7077:7077"
@@ -41,6 +42,7 @@ services:
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_RPC_MESSAGE_MAXSIZE=2047
     depends_on:
       - spark-master
     ports:
@@ -52,6 +54,7 @@ services:
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_RPC_MESSAGE_MAXSIZE=2047
     depends_on:
       - spark-master
     ports:
@@ -63,8 +66,30 @@ services:
     environment:
       - SPARK_MODE=client
       - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_RPC_MESSAGE_MAXSIZE=2047
     depends_on:
       - spark-master
     volumes:
-      - ./stream:/stream  # creates an empty folder in local and in docker
-      - .:/jackpot # this copys everything in the local to the docker container you can understand this by going to master container cd backwards to get jackpot and do ls -lart to see the local
+      - ./stream:/stream  # creates an empty folder in local and in docker,
+      - .:/jackpot # this copys everything in the local to the docker container you can understand ,
+                  #this by going to master container cd backwards to get jackpot and do ls -lart to see the local
+
+#################################################### cassandra 
+
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra
+    ports:
+      - "9042:9042"
+      # - "19042:19042"
+    environment:
+      - CASSANDRA_USER=cassandra
+      - CASSANDRA_PASSWORD=cassandra
+      - CASSANDRA_LISTEN_ADDRESS=127.0.0.1  # Bind to all interfaces
+      # - CASSANDRA_BROADCAST_ADDRESS=cassandra # Advertise the container name
+      - CASSANDRA_RPC_ADDRESS=127.0.0.1    # Bind to all interfaces
+      - rpc_port=9042
+    volumes:
+       - .:/home
+       - /cassandra-data:/var/lib/cassandra # this is being used to make sure the data being created is presisted 
+      # - ./cassandra-config:/etc/cassandra
