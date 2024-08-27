@@ -20,7 +20,7 @@ topics = f"{topic_1},{topic_2}"
 spark = SparkSession.builder \
     .appName("officialnow") \
     .master("spark://spark-master:7077") \
-    .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2,com.datastax.spark:spark-cassandra-connector_2.12:3.5.1") \
+    .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2,com.datastax.spark:spark-cassandra-connector_2.12:3.0.0") \
     .config("spark.cassandra.connection.host", "localhost")\
     .config("spark.cassandra.connection.port", "9042") \
     .getOrCreate()
@@ -103,8 +103,7 @@ def process_batch(df, batch_id):
 # Writing the DataFrame to Cassandra
 cassandra_query = df_parsed.writeStream \
     .foreachBatch(process_batch) \
-    .outputMode("update") \
-    .trigger(processingTime="40 seconds") \
+    .outputMode("append") \
     .start() \
     .awaitTermination()
 

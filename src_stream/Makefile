@@ -3,7 +3,7 @@
 spark:
 	docker compose run spark-submit spark-submit \
   --master spark://spark-master:7077 \
-  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2,com.datastax.spark:spark-cassandra-connector_2.12:3.5.1 \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2,com.datastax.spark:spark-cassandra-connector_2.12:3.5.1, \
   --conf spark.sql.extensions=com.datastax.spark.connector.CassandraSparkExtensions \
   /stream/spark.py
 
