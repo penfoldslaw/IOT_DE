@@ -1,0 +1,8 @@
+# Use the Bitnami Spark image as the base image
+FROM bitnami/spark:latest
+
+# Install the cassandra-driver
+RUN pip install cassandra-driver pandas
+
+# Set working directory
+WORKDIR /jackpot

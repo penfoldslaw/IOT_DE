@@ -20,9 +20,11 @@ topics = f"{topic_1},{topic_2}"
 spark = SparkSession.builder \
     .appName("officialnow") \
     .master("spark://spark-master:7077") \
-    .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2,com.datastax.spark:spark-cassandra-connector_2.12:3.0.0") \
-    .config("spark.cassandra.connection.host", "localhost")\
-    .config("spark.cassandra.connection.port", "9042") \
+    .config("spark.jars.packages", "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2,com.datastax.spark:spark-cassandra-connector_2.12:3.5.1") \
+    .config("spark.cassandra.connection.host", "cassandra")\
+    .config("spark.cassandra.connection.port", "9042")\
+    .config("spark.cassandra.auth.username","cassandra")\
+    .config("spark.cassandra.auth.password","cassandra")\
     .getOrCreate()
 
 spark.sparkContext.setLogLevel("ERROR") # hides alot of logs 
@@ -52,7 +54,7 @@ df = spark \
     .readStream \
     .format("kafka") \
     .option("kafka.bootstrap.servers", "kafka:9094") \
-    .option("subscribe",topics) \
+    .option("subscribe","f1telemetry1") \
     .option("startingOffsets", "earliest") \
     .load()
 
@@ -70,27 +72,32 @@ df_parsed = df_parsed.withColumn("tire_temps", from_json(col("tire_temps"), tire
 
 df_parsed = df_parsed.select(
     col("id"),
-    col("timestamp"),
-    col("rpm"),
-    col("gear"),
-    col("steer"),
-    col("throttle_position"),
-    col("Brake"),
+    col("brake"),
     col("tire_temps.front_left").alias("front_left_temp"),
     col("tire_temps.front_right").alias("front_right_temp"),
+    col("gear"),
     col("tire_temps.rear_left").alias("rear_left_temp"),
-    col("tire_temps.rear_right").alias("rear_right_temp")
+    col("tire_temps.rear_right").alias("rear_right_temp"),
+    col("rpm"),
+    col("steer"),
+    col("throttle_position"),
+    col("timestamp"),
 ) # only being used because of nested json
 
 
 
-# Start streaming query and writing it to the console
-query = df_parsed.writeStream \
-    .outputMode("append") \
-    .format("console") \
-    .option("truncate", "false") \
-    .start() \
-    .awaitTermination()
+# # Start streaming query and writing it to the console
+# query = df_parsed.writeStream \
+#     .outputMode("append") \
+#     .format("console") \
+#     .option("truncate", "false") \
+#     .start() \
+#     .awaitTermination()
+
+def take_time(a):
+    time.sleep(a)
+    print(f'wait {a} before starting')
+
 
 def process_batch(df, batch_id):
     df.write \
@@ -103,7 +110,7 @@ def process_batch(df, batch_id):
 # Writing the DataFrame to Cassandra
 cassandra_query = df_parsed.writeStream \
     .foreachBatch(process_batch) \
-    .outputMode("append") \
+    .outputMode("update") \
     .start() \
     .awaitTermination()
 

@@ -3,14 +3,27 @@
 spark:
 	docker compose run spark-submit spark-submit \
   --master spark://spark-master:7077 \
-  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2,com.datastax.spark:spark-cassandra-connector_2.12:3.5.1, \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2,com.datastax.spark:spark-cassandra-connector_2.12:3.5.1 \
   --conf spark.sql.extensions=com.datastax.spark.connector.CassandraSparkExtensions \
+  --conf spark.cassandra.connection.host=cassandra \
+  --conf spark.cassandra.connection.port=9042 \
+  --conf spark.cassandra.auth.username=cassandra \
+  --conf spark.cassandra.auth.password=cassandra \
   /stream/spark.py
+
 
 # To change the file change spark.py to what you want or create a run with a different name
 
 spark2:
-	docker compose run spark-submit spark-submit --master spark://spark-master:7077 --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2 src_stream/stream2/spark.py
+	docker compose run spark-submit spark-submit \
+  --master spark://spark-master:7077 \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.2,com.datastax.spark:spark-cassandra-connector_2.12:3.5.1 \
+  --conf spark.sql.extensions=com.datastax.spark.connector.CassandraSparkExtensions \
+  --conf spark.cassandra.connection.host=cassandra \
+  --conf spark.cassandra.connection.port=9042 \
+  --conf spark.cassandra.auth.username=cassandra \
+  --conf spark.cassandra.auth.password=cassandra \
+  /stream/spark2.py
 # To change the file change spark.py to what you want or create a run with a different name
 
 
@@ -49,7 +62,7 @@ doc_submit:
 	docker exec -it spark-submit /bin/bash
 
 cqlsh:
-	docker exec -it cassandra cqlsh
+	docker exec -it cassandra cqlsh cassandra 9042
 
 cassandra:
 	docker exec -it cassandra bin/bash
