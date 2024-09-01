@@ -94,14 +94,6 @@ services:
     volumes:
       - .:/home
       - /cassandra-data:/var/lib/cassandra
-    deploy:
-      resources:
-        limits:
-          memory: 6G
-          cpus: "2.0"
-        reservations:
-          memory: 2G
-          cpus: "1.0"
     networks:
       - default
 
