@@ -26,7 +26,7 @@ services:
       - default
 
   spark-master:
-    build: .
+    image: bitnami/spark:latest
     container_name: spark-master
     environment:
       - SPARK_RPC_MESSAGE_MAXSIZE=2047
@@ -40,7 +40,7 @@ services:
       - default
 
   spark-worker-1:
-    build: .
+    image: bitnami/spark:latest
     container_name: spark-worker-1
     environment:
       - SPARK_MODE=worker
@@ -54,7 +54,7 @@ services:
       - default
 
   spark-worker-2:
-    build: .
+    image: bitnami/spark:latest
     container_name: spark-worker-2
     environment:
       - SPARK_MODE=worker
@@ -68,7 +68,7 @@ services:
       - default
   
   spark-submit:
-    build: .
+    image: bitnami/spark:latest
     container_name: spark-submit
     environment:
       - SPARK_MODE=client
@@ -77,8 +77,8 @@ services:
     depends_on:
       - spark-master
     volumes:
-      - ./stream:/stream
-      - .:/jackpot
+      - ./stream:/stream #docker creates a stream folder in local
+      - .:/jackpot  #this loads the local data into a folder in the docker container called jackpot in this container
     networks:
       - default
 
@@ -93,9 +93,9 @@ services:
       - CASSANDRA_PASSWORD=cassandra
     volumes:
       - .:/home
-      - /cassandra-data:/var/lib/cassandra
+      - /cassandra-data:/var/lib/cassandra # this is to presist the data you can run docker down and still come up to it
     networks:
-      - default
+      - default  # makes sure the network are all on the same ip address
 
 networks:
   default:
