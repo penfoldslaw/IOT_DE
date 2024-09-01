@@ -2,10 +2,11 @@
 ##### code to run it in the run.sh
 
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import from_json, col
+from pyspark.sql.functions import from_json, col, udf
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
 from pyspark.sql.functions import expr
 from pyspark.sql.functions import *
+import uuid
 import time
 import configparser
 
@@ -54,7 +55,7 @@ df = spark \
     .readStream \
     .format("kafka") \
     .option("kafka.bootstrap.servers", "kafka:9094") \
-    .option("subscribe","f1telemetry1") \
+    .option("subscribe",topics) \
     .option("startingOffsets", "earliest") \
     .load()
 
@@ -69,8 +70,16 @@ df_parsed = df.selectExpr("CAST(value AS STRING)") \
 
 df_parsed = df_parsed.withColumn("tire_temps", from_json(col("tire_temps"), tire_temps_schema)) # only being used because of nested json
 
+def generate_uuid():
+    return str(uuid.uuid4())
+
+uuid_udf = udf(generate_uuid, StringType())
+
+df_parsed = df_parsed.withColumn("uuid", uuid_udf())
+
 
 df_parsed = df_parsed.select(
+    col("uuid"),
     col("id"),
     col("brake"),
     col("tire_temps.front_left").alias("front_left_temp"),
@@ -94,9 +103,7 @@ df_parsed = df_parsed.select(
 #     .start() \
 #     .awaitTermination()
 
-def take_time(a):
-    time.sleep(a)
-    print(f'wait {a} before starting')
+
 
 
 def process_batch(df, batch_id):

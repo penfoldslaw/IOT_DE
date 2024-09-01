@@ -19,7 +19,8 @@ session.execute("DROP TABLE IF EXISTS telemetry_keyspace_1.f1_data_1;")
 # Creating a table
 session.execute("""
 CREATE TABLE IF NOT EXISTS telemetry_keyspace.f1_data (
-    id INT PRIMARY KEY,
+    uuid UUID PRIMARY KEY,
+    id INT,
     timestamp TEXT,
     rpm INT,
     gear INT,
